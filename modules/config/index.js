@@ -1,20 +1,20 @@
 'use strict';
 
-const path = require('path')
-  , fs = require('fs')
-  , iron_worker = require('iron_worker')
-  , yaml = require('js-yaml');
+const path = require('path');
+const fs = require('fs');
+const ironWorker = require('iron_worker');
+const yaml = require('js-yaml');
+const conf = require('nconf');
 
 
-module.exports = function (app, stores) {
-  stores = stores || {};
+module.exports = (app, stores) => {
+  const storesFiles = stores || {};
+  const env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
+  const rootPath = path.normalize(`${__dirname}/../..`);
 
-  let env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
-  let rootPath = path.normalize(__dirname + '/../..');
-
-  let conf = app.config = require('nconf');
-
-  console.log('%s - \u001b[32minfo\u001b[39m: [config] using [%s] configuration', new Date().toISOString(), env);
+  console.log('%s - \u001b[32minfo\u001b[39m: [config] using [%s] configuration',
+    new Date().toISOString()
+    , env);
 
 
   //  Hierarchy
@@ -23,29 +23,42 @@ module.exports = function (app, stores) {
   //  2. Environment variables
   //  3. Arguments
   //  4. ConfigFiles
-  conf.overrides(yaml.safeLoad(iron_worker.config()));
+  conf.overrides(yaml.safeLoad(ironWorker.config()));
   conf.env('_');
   conf.argv();
 
   let i = 1;
-  stores.forEach(function (file) {
-    if (file && fs.existsSync(file)) {
-      if (file.indexOf('/') != 0) {
-        file = rootPath + '/' + file;
-      }
-      file = path.normalize(file);
-      console.log('%s - \u001b[32minfo\u001b[39m: [config] using file [%s]', new Date().toISOString(), file);
-      try {
-        if (!fs.existsSync(file)) {
-          throw new Error('File doesn\'t exist');
+  storesFiles.forEach((configFile) => {
+    let file = configFile;
+
+    if (file) {
+      if (fs.existsSync(file)) {
+        if (file.indexOf('/') !== 0) {
+          file = `${rootPath}/${file}`;
         }
-        conf.use('z' + i++, {type: 'file', file: file});
-      } catch (e) {
-        console.log('%s - \u001b[31merror\u001b[39m: [config] file [%s] error [%s]', new Date().toISOString(), file, e.message);
-      }
-    } else {
-      if (file) {
-        console.log('%s - \u001b[31mwarn\u001b[39m: [config] file [%s] not exists', new Date().toISOString(), file);
+        file = path.normalize(file);
+        console.log('%s - \u001b[32minfo\u001b[39m: [config] using file [%s]',
+          new Date().toISOString(),
+          file);
+        try {
+          if (!fs.existsSync(file)) {
+            throw new Error('File doesn\'t exist');
+          }
+          const obj = {
+            type: 'file',
+            file,
+          };
+          conf.use(`z${i++}`, obj);
+        } catch (e) {
+          console.log('%s - \u001b[31merror\u001b[39m: [config] file [%s] error [%s]',
+            new Date().toISOString(),
+            file,
+            e.message);
+        }
+      } else {
+        console.log('%s - \u001b[31mwarn\u001b[39m: [config] file [%s] not exists',
+          new Date().toISOString(),
+          file);
       }
     }
   });
@@ -54,4 +67,4 @@ module.exports = function (app, stores) {
   conf.set('rootPath', rootPath);
 
   return conf;
-}
+};

@@ -1,30 +1,31 @@
-'use strict'
+'use strict';
 
 const app = {};
 const Promise = require('bluebird');
 const _ = require('lodash');
+const path = require('path');
 
 // Config
-const config = require('./modules/config')(app, [
-  process.env.EXTERNAL_CONFIG
-  , './config/' + (process.env.NODE_ENV || 'local') + '.json'
-  , './config/defaults.json'
+const config = app.config = require('./modules/config')(app, [
+  process.env.EXTERNAL_CONFIG,
+  path.join(__dirname, `./config/${process.env.NODE_ENV || 'local'}.json`),
+  path.join(__dirname, './config/defaults.json'),
 ]);
 
 // Logger
-const logger = require('./modules/logger')(app);
+const logger = app.logger = require('./modules/logger')(app);
 
 // Utils
-const utils = require('./modules/utils')(app);
+const utils = app.utils = require('./modules/utils')(app);
 
 // CT service
-const ctService = require('./modules/ct-service')(app);
+const ctService = app.ctService = require('./modules/ct-service')(app);
 
-const concurrency = config.get("concurrency") || 1;
-logger.debug("Concurrency: %s", concurrency);
+const concurrency = config.get('concurrency') || 1;
+logger.debug('Concurrency: %s', concurrency);
 
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== 'test') {
   // Your code here
 }
 

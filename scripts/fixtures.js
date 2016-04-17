@@ -1,18 +1,22 @@
+'use strict';
+
 const app = {};
 const SphereClient = require('sphere-node-sdk').SphereClient;
 const program = require('commander');
 const _ = require('lodash');
 const rest = require('restler');
 const chance = require('chance').Chance();
+const path = require('path');
+const Promise = require('bluebird');
 
-// Configuration object
-require('./modules/config')(app, [
-  process.env.EXTERNAL_CONFIG
-  , __dirname + '/config/' + (process.env.NODE_ENV || 'local') + '.json'
-  , __dirname + '/config/defaults.json'
+// Config
+const config = app.config = require('../modules/config')(app, [
+  process.env.EXTERNAL_CONFIG,
+  path.join(__dirname, `../config/${process.env.NODE_ENV || 'local'}.json`),
+  path.join(__dirname, '../config/defaults.json'),
 ]);
 
-const config = app.config;
+
 const splashbaseUrl = "http://www.splashbase.co/api/v1/images/random";
 const client = new SphereClient({
   config: {
@@ -63,8 +67,8 @@ let getSequenceNewValue = function (sequence) {
 };
 
 let getNewAddress = function () {
-  let salutation = chance.prefix({gender: "female"});
-  let firstName = chance.first({gender: "female"});
+  let salutation = chance.prefix({ gender: "female" });
+  let firstName = chance.first({ gender: "female" });
   let lastName = chance.last();
   let streetName = chance.street();
   let streetNumber = getRandomNumber(1, 100).toString();
@@ -456,7 +460,7 @@ let createProduct = function (numToCreate) {
     .page(1)
     .perPage(1)
     .fetch().then(function (res) {
-      productType = res.body.results[0];
+      let productType = res.body.results[0];
       return productType.id;
     }).then(function (productTypeId) {
       return client.project.fetch().then(function (res) {
@@ -471,7 +475,6 @@ let createProduct = function (numToCreate) {
         let productTypeId = data.productTypeId;
         let currencyCode = data.currencyCode;
         getNewProduct(productTypeId, currencyCode).then(function (product) {
-          console.log("Request: " + JSON.stringify(product));
           client.products.create(product).then(function (data) {
             console.log("Product created successfully: " + JSON.stringify(data));
           }).catch(function (err) {
@@ -500,10 +503,11 @@ if (program.type === "customer") {
 } else if (program.type === "cart") {
   createCart(numToCreate);
 } else if (program.type === "all") {
-  createCustomer(numToCreate);
-  createProduct(numToCreate);
-  createCart(numToCreate);
-  createOrder(numToCreate);
+  Promise.each([
+    createCustomer(numToCreate),
+    createProduct(numToCreate),
+    createCart(numToCreate),
+    createOrder(numToCreate)]);
 } else {
   console.error("Please provide the type (ie. -t [customer, product, cart, order, all])");
   process.exit(1);

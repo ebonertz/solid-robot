@@ -1,0 +1,12 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script"
+  },
+  "extends": "airbnb/base",
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "arrow-body-style": "off"
+  }
+}
