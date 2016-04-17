@@ -1,0 +1,36 @@
+{
+  "name": "devgurus_node_base",
+  "version": "1.0.0",
+  "description": "Devgurus Node.js base project",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test node jasmine-runner.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "test"
+  },
+  "dependencies": {
+    "bluebird": "^3.1.1",
+    "core-util-is": "^1.0.2",
+    "iron_worker": "^0.1.6",
+    "js-yaml": "^3.4.2",
+    "lodash": "^3.10.1",
+    "nconf": "^0.7.2",
+    "request": "^2.65.0",
+    "sphere-node-sdk": "^1.6.0",
+    "underscore": "^1.8.3",
+    "underscore-mixins": "^0.1.4",
+    "winston": "^1.0.1",
+    "winston-papertrail": "^1.0.1"
+  },
+  "devDependencies": {
+    "chance": "^0.7.7",
+    "commander": "^2.8.1",
+    "jasmine": "^2.3.2",
+    "jasmine-spec-reporter": "^2.4.0",
+    "restler": "^3.3.0"
+  },
+  "author": "javi@devgurus.io",
+  "license": "ISC"
+}

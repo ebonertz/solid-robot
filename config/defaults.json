@@ -1,0 +1,17 @@
+{
+  "sphereProjectConfig": {
+    "clientId": "",
+    "clientSecret": "",
+    "projectKey": "",
+    "apiHost": "api.commercetools.co",
+    "oauthHost": "auth.commercetools.co"
+  },
+  "logger": {
+    "level": "debug"
+  },
+  "concurrency": 5,
+  "papertrail": {
+    "host": "",
+    "port": ""
+  }
+}
