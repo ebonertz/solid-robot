@@ -103,52 +103,59 @@ let getNewAddress = function () {
 
 let getNewOrder = function () {
   return getLineItems().then(function (lineItems) {
-    let orderPrefix = config.get("shopId") || "order";
     let address = getNewAddress();
 
-    return getSequenceNewValue("orderNumberSequence").then(function (orderNumber) {
-      return {
-        orderNumber: orderNumber.toString(),
-        //customerEmail: address.email,
-        //customerId: "d6c1b7c1-962a-4f49-a5b5-a6665539166d",
-        lineItems: lineItems,
-        totalPrice: {
-          currencyCode: _.first(lineItems).price.value.currencyCode,
-          centAmount: _.reduce(lineItems, function (sum, lineItem) {
-            return sum + (lineItem.price.value.centAmount * lineItem.quantity);
-          }, 0)
-        },
-        shippingAddress: address,
-        billingAddress: address,
-        orderState: 'Complete',
-        shipmentState: 'Shipped',
-        paymentState: 'Paid',
-        shippingInfo: {
-          shippingMethodName: "UPS Express",
-          price: {
-            currencyCode: "USD",
-            centAmount: 1000
+    return client.taxCategories.fetch().then((res) => {
+      if (res.body.results.length > 0) {
+        return res.body.results[0];
+      } else {
+        return Promise.reject("Please create at least a tax category in the project");
+      }
+    }).then((taxCategory) => {
+      return getSequenceNewValue("orderNumberSequence").then(function (orderNumber) {
+        return {
+          orderNumber: orderNumber.toString(),
+          //customerEmail: address.email,
+          //customerId: "d6c1b7c1-962a-4f49-a5b5-a6665539166d",
+          lineItems: lineItems,
+          totalPrice: {
+            currencyCode: _.first(lineItems).price.value.currencyCode,
+            centAmount: _.reduce(lineItems, function (sum, lineItem) {
+              return sum + (lineItem.price.value.centAmount * lineItem.quantity);
+            }, 0)
           },
-          shippingRate: {
+          shippingAddress: address,
+          billingAddress: address,
+          orderState: 'Complete',
+          shipmentState: 'Shipped',
+          paymentState: 'Paid',
+          shippingInfo: {
+            shippingMethodName: "UPS Express",
             price: {
               currencyCode: "USD",
               centAmount: 1000
+            },
+            shippingRate: {
+              price: {
+                currencyCode: "USD",
+                centAmount: 1000
+              }
+            },
+            taxRate: {
+              id: "tax_id1",
+              name: "tax_id1",
+              amount: 0,
+              includedInPrice: true,
+              country: "US"
+            },
+            taxCategory: {
+              typeId: "tax-category",
+              id: taxCategory.id
             }
           },
-          taxRate: {
-            id: "tax_id1",
-            name: "tax_id1",
-            amount: 0,
-            includedInPrice: true,
-            country: "US"
-          },
-          taxCategory: {
-            typeId: "tax-category",
-            id: "d0fa1168-ddf9-4627-8cb2-5ba8cfde52e6"
-          }
-        },
-        completedAt: new Date().toISOString()
-      }
+          completedAt: new Date().toISOString()
+        }
+      })
     })
   })
 
@@ -176,46 +183,58 @@ let getNewCustomer = function () {
 
 
 let getNewProduct = function (productTypeId, currencyCode) {
-  let productName = getRandomProductName(1, 10000);
-  let product = {
-    "name": {
-      "en": productName
-    },
-    "slug": {
-      "en": productName + "-slug"
-    },
-    "description": {
-      "en": "Sample product from fixtures.js"
-    },
-    "productType": {
-      "typeId": "product-type",
-      "id": productTypeId
-    },
-    "masterletiant": {
-      "sku": productName + "-sku",
-      "prices": [
-        {
-          "value": {
-            "currencyCode": currencyCode,
-            "centAmount": getRandomNumber(1, 100) * 100
-          }
-        }
-      ]
+  return client.taxCategories.fetch().then((res) => {
+    if (res.body.results.length > 0) {
+      return res.body.results[0];
+    } else {
+      return Promise.reject("Please create at least a tax category in the project");
     }
-  };
+  }).then((taxCategory) => {
+    let productName = getRandomProductName(1, 10000);
+    let product = {
+      "name": {
+        "en": productName
+      },
+      "slug": {
+        "en": productName + "-slug"
+      },
+      "description": {
+        "en": "Sample product from fixtures.js"
+      },
+      "productType": {
+        "typeId": "product-type",
+        "id": productTypeId
+      },
+      "masterVariant": {
+        "sku": productName + "-sku",
+        "prices": [
+          {
+            "value": {
+              "currencyCode": currencyCode,
+              "centAmount": getRandomNumber(1, 100) * 100
+            }
+          }
+        ]
+      },
+      "taxCategory": {
+        "typeId": 'tax-category',
+        "id": taxCategory.id
+      }
+    };
 
-  return new Promise(function (resolve, reject) {
-    rest.get(splashbaseUrl, {
-      query: "images_only=true"
-    }).on("complete", function (image) {
-      product.masterletiant.images = [{
-        "url": image.url,
-        "dimensions": {
-          "w": 1400,
-          "h": 1400
-        }
-      }]
-      return resolve(product);
+    return new Promise(function (resolve, reject) {
+      rest.get(splashbaseUrl, {
+        query: "images_only=true"
+      }).on("complete", function (image) {
+        product.masterVariant.images = [{
+          "url": image.url,
+          "dimensions": {
+            "w": 1400,
+            "h": 1400
+          }
+        }]
+        return resolve(product);
+      })
     })
   })
 };
@@ -356,23 +375,34 @@ let getCartLineItems = function () {
 
 
 let createCustomer = function (numToCreate) {
+  const promises = [];
+
   _.times(numToCreate, function () {
-    getNewCustomer().then(function (customer) {
-      client.customers.create(customer).then(function (data) {
-        console.log("Customer created successfully: " + JSON.stringify(data));
+    promises.push(',');
+  });
+
+  return Promise.map(promises, () => {
+    return getNewCustomer().then(function (customer) {
+      return client.customers.create(customer).then(function (data) {
+        console.log("Customer created successfully: %s", data.body.customer.email);
       }).catch(function (err) {
         console.log(JSON.stringify(err, null, 2));
       });
-    });
-
-  });
+    })
+  }, { concurrency: 10 })
 };
 
 let createOrder = function (numToCreate) {
+  let promises = [];
+
   _.times(numToCreate, function () {
-    getNewOrder().then(function (order) {
+    promises.push(',');
+  });
+
+  return Promise.map(promises, () => {
+    return getNewOrder().then(function (order) {
         if (order.customerId) {
-          client.customers.byId(order.customerId).fetch()
+          return client.customers.byId(order.customerId).fetch()
             .then(function (res) {
               return res.body;
             }).then(function (customer) {
@@ -382,20 +412,20 @@ let createOrder = function (numToCreate) {
                 order.shippingAddress = order.billingAddress;
                 order.customerEmail = customer.email;
               }
-              client.orders.import(order).then(function (data) {
-                console.log("Order created successfully: " + JSON.stringify(data));
+              return client.orders.import(order).then(function (data) {
+                console.log("Order created successfully: %s", data.body.orderNumber);
               }).catch(function (err) {
                 console.log(JSON.stringify(err, null, 2));
               });
             })
         } else if (order.customerEmail) {
-          client.orders.import(order).then(function (data) {
-            console.log("Order created successfully: " + JSON.stringify(data));
+          return client.orders.import(order).then(function (data) {
+            console.log("Order created successfully: %s", data.body.orderNumber);
           }).catch(function (err) {
             console.log(JSON.stringify(err, null, 2));
           });
         } else {
-          client.customers.page(1).perPage(1).fetch()
+          return client.customers.page(1).perPage(1).fetch()
             .then(function (res) {
               return res.body.total;
             }).then(function (totalCustomers) {
@@ -410,17 +440,17 @@ let createOrder = function (numToCreate) {
                 order.shippingAddress = order.billingAddress;
                 order.customerEmail = customer.email;
               }
-              client.orders.import(order).then(function (data) {
-                console.log("Order created successfully: " + JSON.stringify(data));
+              return client.orders.import(order).then(function (data) {
+                console.log("Order created successfully: %s", data.body.orderNumber);
               }).catch(function (err) {
                 console.log(JSON.stringify(err, null, 2));
               });
             })
         }
       }
-    )
-    ;
-  });
+    );
+  }, { concurrency: 10 })
+
 };
 
 
@@ -428,14 +458,25 @@ let getNewCart = function () {
   return getCartLineItems().then(function (lineItems) {
     let address = getNewAddress();
 
-    return Promise.resolve({
-      currency: "USD",
-      //customerEmail: address.email,
-      customerId: "d6c1b7c1-962a-4f49-a5b5-a6665539166d",
-      lineItems: lineItems,
-      shippingAddress: address,
-      billingAddress: address,
-      cartState: 'Active'
+    return client.customers.fetch().then((res) => {
+      if (res.body.results.length > 0) {
+        return Promise.resolve({
+          currency: "USD",
+          customerId: res.body.results[0].id,
+          lineItems: lineItems,
+          shippingAddress: address,
+          billingAddress: address,
+          cartState: 'Active'
+        })
+      } else {
+        return {
+          currency: "USD",
+          lineItems: lineItems,
+          shippingAddress: address,
+          billingAddress: address,
+          cartState: 'Active'
+        }
+      }
     })
   })
 };
@@ -455,8 +496,7 @@ let createCart = function (numToCreate) {
 
 
 let createProduct = function (numToCreate) {
-
-  client.productTypes
+  return client.productTypes
     .page(1)
     .perPage(1)
     .fetch().then(function (res) {
@@ -471,24 +511,30 @@ let createProduct = function (numToCreate) {
         }
       })
     }).then(function (data) {
+      const promises = [];
+      let productTypeId = data.productTypeId;
+      let currencyCode = data.currencyCode;
+
       _.times(numToCreate, function () {
-        let productTypeId = data.productTypeId;
-        let currencyCode = data.currencyCode;
-        getNewProduct(productTypeId, currencyCode).then(function (product) {
-          client.products.create(product).then(function (data) {
-            console.log("Product created successfully: " + JSON.stringify(data));
+        promises.push(',');
+      });
+
+      return Promise.map(promises, () => {
+        return getNewProduct(productTypeId, currencyCode).then(function (product) {
+          return client.products.create(product).then(function (data) {
+            console.log("Product created successfully: %s", data.body.masterData.current.name.en);
           }).catch(function (err) {
             console.log(JSON.stringify(err, null, 2));
           });
         });
-      })
+      }, { concurrency: 10 });
     })
 }
 
 
 program
   .version('0.0.1')
-  .option('-t, --type <src>', 'Type (either "customer", "product", "cart", "order", "all")')
+  .option('-t, --type <src>', 'Type (either "customer", "product", "order", "all")')
   .option('-n, --number <src>', 'Number of entities to create')
   .parse(process.argv);
 
@@ -501,13 +547,18 @@ if (program.type === "customer") {
 } else if (program.type === "product") {
   createProduct(numToCreate);
 } else if (program.type === "cart") {
-  createCart(numToCreate);
+  //createCart(numToCreate);
 } else if (program.type === "all") {
-  Promise.each([
+  Promise.all([
     createCustomer(numToCreate),
-    createProduct(numToCreate),
-    createCart(numToCreate),
-    createOrder(numToCreate)]);
+    createProduct(numToCreate)]).then(() => {
+    Promise.all([
+      //createCart(numToCreate),
+      createOrder(numToCreate)]).then(() => {
+    }).then(() => {
+      console.log("All entities created")
+    })
+  })
 } else {
   console.error("Please provide the type (ie. -t [customer, product, cart, order, all])");
   process.exit(1);
