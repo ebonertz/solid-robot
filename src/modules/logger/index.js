@@ -1,20 +1,19 @@
-'use strict';
+import winston from 'winston';
+import {
+  Papertrail,
+} from 'winston-papertrail';
 
-const winston = require('winston');
-const winstonPapertrail = require('winston-papertrail').Papertrail;
-
-module.exports = (app) => {
-  const config = app.config;
+export default (config) => {
   const level = config.get('logger:level');
 
-  const transports = [new (winston.transports.Console)({
+  const transports = [new(winston.transports.Console)({
     level,
     json: false,
     timestamp: true,
     colorize: true,
   })];
 
-  const exceptionHandlers = [new (winston.transports.Console)({
+  const exceptionHandlers = [new(winston.transports.Console)({
     level,
     json: false,
     timestamp: true,
@@ -24,7 +23,7 @@ module.exports = (app) => {
   })];
 
   if (config.get('papertrail') && config.get('papertrail:host')) {
-    transports.push(new winston.transports.Papertrail({
+    transports.push(new Papertrail({
       level,
       timestamp: true,
       colorize: true,
@@ -32,7 +31,7 @@ module.exports = (app) => {
       port: config.get('papertrail:port'),
     }));
 
-    exceptionHandlers.push(new winston.transports.Papertrail({
+    exceptionHandlers.push(new Papertrail({
       level,
       timestamp: true,
       colorize: true,
@@ -41,7 +40,7 @@ module.exports = (app) => {
     }));
   }
 
-  const logger = new (winston.Logger)({
+  const logger = new(winston.Logger)({
     transports,
     exceptionHandlers,
     exitOnError: false,

@@ -1,2 +1,4 @@
 scripts/
 spec/
+app/
+jasmine-runner.js

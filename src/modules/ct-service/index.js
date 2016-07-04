@@ -1,15 +1,7 @@
-'use strict';
+import { SphereClient } from 'sphere-node-sdk';
 
-const SphereClient = require('sphere-node-sdk').SphereClient;
-const Promise = require('bluebird');
-const _ = require('lodash');
-
-module.exports = (app) => {
+export default (config) => {
   const module = {};
-  const config = app.config;
-  const logger = app.logger;
-  const utils = app.utils;
-
   const client = new SphereClient({
     config: {
       client_id: config.get('sphereProjectConfig:clientId'),
@@ -21,7 +13,6 @@ module.exports = (app) => {
   });
 
   module.getOneProduct = () => client.products.page(1).perPage(1).fetch();
-
 
   return module;
 };

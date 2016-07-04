@@ -1,20 +1,17 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
-const ironWorker = require('iron_worker');
-const yaml = require('js-yaml');
-const conf = require('nconf');
+import path from 'path';
+import fs from 'fs';
+import ironWorker from 'iron_worker';
+import yaml from 'js-yaml';
+import conf from 'nconf';
 
 
-module.exports = (app, stores) => {
+export default (stores) => {
   const storesFiles = stores || {};
   const env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
   const rootPath = path.normalize(`${__dirname}/../..`);
 
   console.log('%s - \u001b[32minfo\u001b[39m: [config] using [%s] configuration',
-    new Date().toISOString()
-    , env);
+    new Date().toISOString(), env);
 
 
   //  Hierarchy

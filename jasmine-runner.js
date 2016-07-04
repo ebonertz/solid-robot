@@ -1,14 +1,10 @@
-'use strict'
-
 const Jasmine = require('jasmine');
 const SpecReporter = require('jasmine-spec-reporter');
-let noop = function () {
-};
+const jrunner = new Jasmine();
 
-let jrunner = new Jasmine();
 jrunner.configureDefaultReporter({
-  displayStacktrace: "all"
+  displayStacktrace: 'all',
 });
-jasmine.getEnv().addReporter(new SpecReporter());   // add jasmine-spec-reporter
-jrunner.loadConfigFile();                           // load jasmine.json configuration
+jasmine.getEnv().addReporter(new SpecReporter()); // add jasmine-spec-reporter
+jrunner.loadConfigFile(); // load jasmine.json configuration
 jrunner.execute();

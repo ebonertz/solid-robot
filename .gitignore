@@ -85,3 +85,6 @@ build/Release
 node_modules
 # Zip files
 *.zip
+
+# Generated files
+app/
