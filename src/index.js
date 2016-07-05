@@ -9,7 +9,7 @@ const app = {};
 // Config
 const config = app.config = configModule([
   process.env.EXTERNAL_CONFIG,
-  path.join(__dirname, `../config/${process.env.NODE_ENV || 'local'}.json`),
+  path.join(__dirname, `../config/${process.env.NODE_ENV || 'development'}.json`),
   path.join(__dirname, '../config/defaults.json'),
 ]);
 
@@ -28,6 +28,10 @@ logger.debug('Concurrency: %s', concurrency);
 
 if (process.env.NODE_ENV !== 'test') {
   // Your code here
+  setTimeout(() => {
+    logger.info('Process sucessfully finished');
+    process.exit(0);
+  }, 1000);
 }
 
 export default app;

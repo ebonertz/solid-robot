@@ -1,32 +1,37 @@
 'use strict';
 
+import { SphereClient } from 'sphere-node-sdk';
+import program from 'commander';
+import _ from 'lodash';
+import rest from 'restler';
+import path from 'path';
+import Promise from 'bluebird';
+import chanceModule from 'chance';
+import configModule from '../modules/config';
+
+const chance = chanceModule.Chance();
 const app = {};
-const SphereClient = require('sphere-node-sdk').SphereClient;
-const program = require('commander');
-const _ = require('lodash');
-const rest = require('restler');
-const chance = require('chance').Chance();
-const path = require('path');
-const Promise = require('bluebird');
 
 // Config
-const config = app.config = require('../modules/config')(app, [
+const config = app.config = configModule([
   process.env.EXTERNAL_CONFIG,
-  path.join(__dirname, `../config/${process.env.NODE_ENV || 'local'}.json`),
-  path.join(__dirname, '../config/defaults.json'),
+  path.join(__dirname, `../../config/${process.env.NODE_ENV || 'development'}.json`),
+  path.join(__dirname, '../../config/defaults.json'),
 ]);
+
 
 
 const splashbaseUrl = "http://www.splashbase.co/api/v1/images/random";
 const client = new SphereClient({
   config: {
-    client_id: config.get("sphereProjectConfig:clientId"),
-    client_secret: config.get("sphereProjectConfig:clientSecret"),
-    project_key: config.get("sphereProjectConfig:projectKey")
+    client_id: config.get('sphereProjectConfig:clientId'),
+    client_secret: config.get('sphereProjectConfig:clientSecret'),
+    project_key: config.get('sphereProjectConfig:projectKey'),
   },
-  host: config.get("sphereProjectConfig:apiHost"),
-  oauth_host: config.get("sphereProjectConfig:oauthHost")
+  host: config.get('sphereProjectConfig:apiHost'),
+  oauth_host: config.get('sphereProjectConfig:oauthHost'),
 });
+
 
 
 let getSequenceNewValue = function (sequence) {
@@ -563,6 +568,3 @@ if (program.type === "customer") {
   console.error("Please provide the type (ie. -t [customer, product, cart, order, all])");
   process.exit(1);
 }
-
-
-

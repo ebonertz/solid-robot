@@ -12,7 +12,7 @@ const app = {};
 // Config
 const config = app.config = configMod([
   process.env.EXTERNAL_CONFIG,
-  path.join(__dirname, `../../config/${process.env.NODE_ENV || 'local'}.json`),
+  path.join(__dirname, `../../config/${process.env.NODE_ENV || 'development'}.json`),
   path.join(__dirname, '../../config/defaults.json'),
 ]);
 
