@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "test"
+    "url": "https://bitbucket.org/devgurus/microservice_template"
   },
   "author": "javi@devgurus.io",
   "license": "MIT",
