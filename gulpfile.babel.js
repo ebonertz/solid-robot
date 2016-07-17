@@ -71,11 +71,10 @@ gulp.task('test', (cb) => {
   run('set-test-node-env', 'build', 'jasmine', cb);
 });
 
-gulp.task('run_index', () => {
-  shell.task([
-    'node app/index.js',
-  ]);
-});
+gulp.task('run_index', shell.task([
+  'node app/index.js',
+]));
+
 
 gulp.task('run', (cb) => {
   run('set-development-node-env', 'run_index', cb);
