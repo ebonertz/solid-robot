@@ -76,8 +76,12 @@ gulp.task('run_index', shell.task([
 ]));
 
 
-gulp.task('run', (cb) => {
+gulp.task('run_development', (cb) => {
   run('set-development-node-env', 'run_index', cb);
+});
+
+gulp.task('run_production', (cb) => {
+  run('set-production-node-env', 'run_index', cb);
 });
 
 gulp.task('validate_deploy_params', () => {
@@ -105,5 +109,5 @@ gulp.task('deploy', (cb) => {
 });
 
 gulp.task('default', (cb) => {
-  run('test', 'run', cb);
+  run('test', 'run_development', cb);
 });
