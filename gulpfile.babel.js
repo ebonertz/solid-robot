@@ -47,7 +47,7 @@ gulp.task('lint', () => {
 });
 
 gulp.task('jasmine', () => {
-  return gulp.src('app/spec/unit/**/*.spec.js')
+  return gulp.src(['app/spec/unit/**/*.spec.js', 'app/spec/integration/**/*.spec.js'])
     .pipe(jasmine({
       reporter: new reporters.TerminalReporter({
         verbosity: 1,

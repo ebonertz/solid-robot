@@ -1,8 +1,8 @@
 {
   "sphereProjectConfig": {
-    "clientId": "Je8kLtdodf8HtvO22791Iv0F",
-    "clientSecret": "h3rxH--1bMB2pfgeGmDdGzQFugx4k2bA",
-    "projectKey": "us-elite-stage",
+    "clientId": "",
+    "clientSecret": "",
+    "projectKey": "",
     "apiHost": "api.commercetools.co",
     "oauthHost": "auth.commercetools.co"
   },
