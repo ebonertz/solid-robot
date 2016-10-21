@@ -1,8 +1,8 @@
 {
   "sphereProjectConfig": {
-    "clientId": "",
-    "clientSecret": "",
-    "projectKey": "",
+    "clientId": "iqRSwXQh_ITTkTR8Pf87rR1u",
+    "clientSecret": "Yn8Jcws_CtkzZHnaz1go4shoAeBt8A0-",
+    "projectKey": "focali-stage",
     "apiHost": "api.commercetools.co",
     "oauthHost": "auth.commercetools.co"
   },

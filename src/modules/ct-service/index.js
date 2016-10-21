@@ -14,5 +14,26 @@ export default (config) => {
 
   module.getOneProduct = () => client.products.page(1).perPage(1).fetch();
 
+  module.getAllProducts = () => {
+    console.log(client.products);
+    return client.productProjections
+          .all()
+          .staged(true)
+          .fetch()
+          .then((res) => {
+            return res.body.results;
+          });
+  };
+
+  module.getAllOrders = () => {
+    console.log(client.orders);
+    return client.orders
+          .all()
+          .fetch()
+          .then((res) => {
+            return res.body.results;
+          });
+  };
+
   return module;
 };

@@ -86,6 +86,9 @@ node_modules
 # Zip files
 *.zip
 
+# Config File
+config/*.json
+
 # Generated files
 app/
 

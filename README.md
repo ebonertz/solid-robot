@@ -1,6 +1,8 @@
-# Microservice Devgurus template #
+# Kohler POC Microservice #
 
-Template for microservices using the following technologies:
+The purpose of this service is to pull an array of orders, convert the data to XML and send to the Kohler SAP platform
+
+Microservice using the following technologies:
 * NodeJS
 * ES6
 * BabelJS
