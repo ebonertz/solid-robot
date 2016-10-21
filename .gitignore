@@ -86,11 +86,11 @@ node_modules
 # Zip files
 *.zip
 
-# Config File
+# Config files
 config/
 
 # Generated files
 app/
 
-# Temporal files
+# Temporary files
 tmp/
