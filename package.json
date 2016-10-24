@@ -1,7 +1,7 @@
 {
-  "name": "devgurus_node_base",
+  "name": "Kohler-orders-to-SAP",
   "version": "1.0.0",
-  "description": "Devgurus Node.js base project",
+  "description": "commercetools microservice for Kohler project",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test gulp test",
@@ -9,9 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/devgurus/microservice_template"
+    "url": "https://github.com/commercetools/kohler-orders-to-sap.git"
   },
-  "author": "javi@devgurus.io",
+  "author": "evan.bonertz@commercetools.com",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.10.1",
