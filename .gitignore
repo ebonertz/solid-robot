@@ -87,10 +87,8 @@ node_modules
 *.zip
 
 # Config files
-config/
-
-# Generated files
-app/
+/config/
+*
 
 # Temporary files
 tmp/
